@@ -1,12 +1,18 @@
-# randylopez.com
+<p align="center">
+  <img src="frontend/public/pear.svg" alt="Pear logo" width="110" />
+</p>
 
-An interactive developer portfolio for **Randy Lopez**, built as a vintage
-all-in-one computer. You land on a CRT monitor floating over a drifting cloud
-sky; the screen powers on, runs a BIOS-style boot sequence, and types out a
-terminal greeting. Click anywhere to "enter" and the machine boots into a
-full-screen retro desktop — draggable windows, a menu bar, and desktop icons —
-where the About, Contact, System, Studio, and Date & Time windows hold the
-actual portfolio content.
+<h1 align="center">randylopez.com</h1>
+
+<p align="center">
+  An interactive developer portfolio for <strong>Randy Lopez</strong>, built as a vintage all-in-one computer.
+</p>
+
+You land on a CRT monitor floating over a drifting cloud sky; the screen powers
+on, runs a BIOS-style boot sequence, and types out a terminal greeting. Click
+anywhere to "enter" and the machine boots into a full-screen retro desktop —
+draggable windows, a menu bar, and desktop icons — where the About, Contact,
+System, Studio, and Date & Time windows hold the actual portfolio content.
 
 Built with **Vite + SolidJS**. The animated sky is rendered with **Vanta.js /
 three.js**; the monitor frame and screen curvature are pure CSS 3D, so the
