@@ -8,16 +8,7 @@ import {
   education,
   contact,
 } from "../data/portfolio.js";
-import {
-  openWindow,
-  state,
-  getEffectiveDate,
-  nudgeClockHour,
-  nudgeClockMinute,
-  toggleClockMeridiem,
-  setClock24,
-  resetClock,
-} from "../store.js";
+import { openWindow, getEffectiveDate } from "../store.js";
 import {
   AppleMono,
   FolderIcon,
@@ -229,14 +220,16 @@ export function ClockApp() {
     now(); // tick dependency so the readout advances
     return getEffectiveDate();
   };
-  const is24 = () => state.clock24;
-  const overridden = () => state.clockOverride !== null;
-  const hourLabel = () => {
-    const h = eff().getHours();
-    return is24() ? h.toString().padStart(2, "0") : (h % 12 || 12).toString();
-  };
+  const hourLabel = () => (eff().getHours() % 12 || 12).toString();
   const minLabel = () => eff().getMinutes().toString().padStart(2, "0");
   const meridiem = () => (eff().getHours() >= 12 ? "PM" : "AM");
+  const dateLabel = () =>
+    eff().toLocaleDateString(undefined, {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
 
   return (
     <div class="clockset">
@@ -246,70 +239,9 @@ export function ClockApp() {
           <span class="clock-colon">:</span>
           {minLabel()}
         </span>
-        <Show when={!is24()}>
-          <span class="clock-ampm">{meridiem()}</span>
-        </Show>
+        <span class="clock-ampm">{meridiem()}</span>
       </div>
-
-      <div class="clock-status" classList={{ custom: overridden() }}>
-        {overridden() ? "Custom time" : "Local time"}
-      </div>
-
-      <div class="clock-rows">
-        <div class="clock-row">
-          <span class="clock-row-label">Hour</span>
-          <div class="clock-stepper">
-            <button class="step-btn" onClick={() => nudgeClockHour(-1)} aria-label="Hour down">
-              –
-            </button>
-            <button class="step-btn" onClick={() => nudgeClockHour(1)} aria-label="Hour up">
-              +
-            </button>
-          </div>
-        </div>
-        <div class="clock-row">
-          <span class="clock-row-label">Minute</span>
-          <div class="clock-stepper">
-            <button class="step-btn" onClick={() => nudgeClockMinute(-1)} aria-label="Minute down">
-              –
-            </button>
-            <button class="step-btn" onClick={() => nudgeClockMinute(1)} aria-label="Minute up">
-              +
-            </button>
-          </div>
-        </div>
-        <Show when={!is24()}>
-          <div class="clock-row">
-            <span class="clock-row-label">Meridiem</span>
-            <button class="clock-toggle" onClick={() => toggleClockMeridiem()}>
-              {meridiem()}
-            </button>
-          </div>
-        </Show>
-        <div class="clock-row">
-          <span class="clock-row-label">Format</span>
-          <div class="clock-seg">
-            <button classList={{ "seg-on": !is24() }} onClick={() => setClock24(false)}>
-              12h
-            </button>
-            <button classList={{ "seg-on": is24() }} onClick={() => setClock24(true)}>
-              24h
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <button
-        class="btn clock-reset"
-        disabled={!overridden()}
-        onClick={() => resetClock()}
-      >
-        Reset to local time
-      </button>
-
-      <p class="clock-note">
-        The time of day also tints the sky on the start screen.
-      </p>
+      <div class="clock-status">{dateLabel()}</div>
     </div>
   );
 }

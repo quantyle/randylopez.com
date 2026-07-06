@@ -1,5 +1,4 @@
-import { onMount, onCleanup, createEffect } from "solid-js";
-import { getEffectiveHour } from "../store.js";
+import { onMount, onCleanup } from "solid-js";
 
 // 12 sky palettes across the day, indexed by Math.floor(localHour / 2).
 // Each: Vanta Clouds colors + a CSS fallback gradient (shown until the WebGL
@@ -31,9 +30,10 @@ const SKIES = [
   { label: "night", sky: 0x121f3c, cloud: 0x303c58, cloudShadow: 0x0a1426, sun: 0x8a9ec2, sunGlare: 0x4a5a7c, sunlight: 0x6a7a9c, speed: 0.5, bg: ["#0c1730", "#14213c", "#1c2c48"] },
 ];
 
+// Sky is fixed to one default palette — no time-of-day changes.
+const DEFAULT_SKY = 11; // night (deep blue night sky)
 function paletteForNow() {
-  const h = getEffectiveHour();
-  return SKIES[Math.floor(h / 2) % 12];
+  return SKIES[DEFAULT_SKY];
 }
 
 // Make clouds livelier than the palette defaults (more chaotic drift).
@@ -72,16 +72,7 @@ export default function SkyBackground(props) {
     }
   };
 
-  // Re-run when the (effective) hour changes — e.g. the clock override.
-  createEffect(() => {
-    getEffectiveHour();
-    applyPalette();
-  });
-
   onMount(async () => {
-    // Catch real time crossing into a new time-of-day bucket.
-    const poll = setInterval(() => applyPalette(), 30000);
-    onCleanup(() => clearInterval(poll));
     try {
       const THREE = await import("three");
       const mod = await import("vanta/dist/vanta.clouds.min.js");

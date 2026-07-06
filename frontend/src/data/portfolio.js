@@ -26,16 +26,6 @@ export const projects = [
     forks: 2,
   },
   {
-    name: "matching-engine",
-    year: "Python",
-    blurb:
-      "An exchange matching engine written in Python — the order book and price-time priority core that sits at the heart of any trading venue.",
-    stack: ["Python", "Order matching", "Market microstructure"],
-    link: "https://github.com/quantyle/matching-engine",
-    stars: 0,
-    forks: 0,
-  },
-  {
     name: "coinbase-correlation-analysis",
     year: "Jupyter",
     blurb:
@@ -44,16 +34,6 @@ export const projects = [
     link: "https://github.com/quantyle/coinbase-correlation-analysis",
     stars: 3,
     forks: 1,
-  },
-  {
-    name: "electron-memory-profiler",
-    year: "JavaScript",
-    blurb:
-      "A memory-profiling and visualization tool with a React front end and a Node.js backend, packaged as a desktop app.",
-    stack: ["React", "Node.js", "Electron"],
-    link: "https://github.com/quantyle/electron-memory-profiler",
-    stars: 0,
-    forks: 0,
   },
   {
     name: "CAN-Shark",
@@ -108,13 +88,13 @@ export const experience = [
     note: "Lead engineering at a finance firm. Building AI infrastructure — RAG and vector search, model serving with Hugging Face TGI, and AI pipelines on Google Genkit — alongside low-latency trading systems and the frontends the team works in.",
   },
   {
-    role: "CEO & Software Engineer",
+    role: "CEO, Software Engineer",
     org: "Quantyle LLC",
     period: "May 2019 — Sep 2023",
     note: "Founded Quantyle and built its algorithmic-trading platform end to end: a custom trading IDE and DSL, a Python matching engine, and market-research tooling — much of it open-sourced at github.com/quantyle.",
   },
   {
-    role: "CEO & Software Engineer",
+    role: "CEO, Software Engineer",
     org: "Logentix LLC",
     period: "2016 — 2019",
     note: "Ran Logentix as CEO while engineering the product hands-on across the fullstack, from frontend to backend services.",

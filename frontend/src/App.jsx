@@ -10,13 +10,19 @@ const BODY_W = 748;
 const BODY_H = 614;
 const BODY_H_SM = 710;
 
+const INTRO_GREET = "hi there";
+const INTRO_BIO =
+  "I'm Randy, a software engineer based in New York City. I build trading systems, artificial intelligence, and user experiences. Welcome to my operating system.";
+const GREET_CPS = 80;
+const BIO_CPS = 22;
+
 const SHELL_LINES = [
   "PearBIOS v2.4 \u2014 POST ok",
   "booting pear/os \u2026",
   "[  ok  ] mounted /dev/floppy0",
   "[  ok  ] started display manager",
   "[  ok  ] loaded portfolio modules",
-  "[  ok  ] net: randylopez.com is up",
+  "[  ok  ] net: randylopez.dev is up",
   "starting desktop environment \u2026",
 ];
 
@@ -30,7 +36,11 @@ export default function App() {
   const [booting, setBooting] = createSignal(false);
 
   const [introReady, setIntroReady] = createSignal(false);
+  const [screenOn, setScreenOn] = createSignal(false);
   const [bootCount, setBootCount] = createSignal(0);
+  const [greetTyped, setGreetTyped] = createSignal("");
+  const [bioTyped, setBioTyped] = createSignal("");
+  const [typingDone, setTypingDone] = createSignal(false);
   let introTimers = [];
 
   const [fitScale, setFitScale] = createSignal(initialFit());
@@ -177,26 +187,83 @@ export default function App() {
     setTiltY("0deg");
   }
 
-  function startIntroBoot() {
-    introTimers.forEach(clearTimeout);
-    introTimers = [];
-    if (reduceMotion) {
-      setBootCount(SHELL_LINES.length);
-      setIntroReady(true);
-      return;
-    }
-    setIntroReady(false);
-    setBootCount(0);
+  let introTyped = false;
+  function typeIntro() {
+    setGreetTyped("");
+    setBioTyped("");
+    setTypingDone(false);
+    let i = 0;
+    const stepGreet = () => {
+      i++;
+      setGreetTyped(INTRO_GREET.slice(0, i));
+      if (i < INTRO_GREET.length)
+        introTimers.push(setTimeout(stepGreet, GREET_CPS));
+      else introTimers.push(setTimeout(stepBio, 420));
+    };
+    let j = 0;
+    const stepBio = () => {
+      j++;
+      setBioTyped(INTRO_BIO.slice(0, j));
+      if (j < INTRO_BIO.length) introTimers.push(setTimeout(stepBio, BIO_CPS));
+      else setTypingDone(true);
+    };
+    introTimers.push(setTimeout(stepGreet, 240));
+  }
+
+  const SCREEN_ON_DELAY = 1000;
+
+  function runBootLog() {
     SHELL_LINES.forEach((_, i) => {
       introTimers.push(setTimeout(() => setBootCount(i + 1), 140 + i * 150));
     });
     introTimers.push(
-      setTimeout(() => setIntroReady(true), 140 + SHELL_LINES.length * 150 + 360)
+      setTimeout(
+        () => setIntroReady(true),
+        140 + SHELL_LINES.length * 150 + 360
+      )
+    );
+  }
+
+  function startIntroBoot() {
+    introTimers.forEach(clearTimeout);
+    introTimers = [];
+    setScreenOn(false);
+    setIntroReady(false);
+    introTyped = false;
+    setGreetTyped("");
+    setBioTyped("");
+    setTypingDone(false);
+    setBootCount(0);
+    if (reduceMotion) {
+      setScreenOn(true);
+      setBootCount(SHELL_LINES.length);
+      introTyped = true;
+      setGreetTyped(INTRO_GREET);
+      setBioTyped(INTRO_BIO);
+      setTypingDone(true);
+      setIntroReady(true);
+      return;
+    }
+    // Monitor sits dark, then powers on and starts booting.
+    introTimers.push(
+      setTimeout(() => {
+        setScreenOn(true);
+        runBootLog();
+      }, SCREEN_ON_DELAY)
     );
   }
 
   createEffect(() => {
     if (mode() === "intro") startIntroBoot();
+  });
+
+  // Type the intro title/subtitle whenever the screen is revealed —
+  // covers both the timed reveal and clicking to skip the boot log.
+  createEffect(() => {
+    if (introReady() && !reduceMotion && !introTyped) {
+      introTyped = true;
+      typeIntro();
+    }
   });
 
   onMount(() => {
@@ -254,39 +321,57 @@ export default function App() {
                 <div class="screen-surround">
                   <div class="screen-frame">
                     <div class="glass">
-                      <div class="viewport intro-viewport screen-on">
+                      <div
+                        class="viewport intro-viewport"
+                        classList={{ "screen-on": screenOn() }}
+                      >
                         <div
                           class="intro-screen"
                           onClick={() => {
+                            if (!screenOn()) return;
                             if (introReady()) start();
                             else setIntroReady(true);
                           }}
                         >
-                          <Show
-                            when={introReady()}
-                            fallback={
-                              <div class="boot-log">
-                                <For each={SHELL_LINES.slice(0, bootCount())}>
-                                  {(l) => <div class="boot-line">{l}</div>}
-                                </For>
-                                <div class="boot-line">
-                                  <span class="boot-cursor">█</span>
+                          <Show when={screenOn()}>
+                            <Show
+                              when={introReady()}
+                              fallback={
+                                <div class="boot-log">
+                                  <For each={SHELL_LINES.slice(0, bootCount())}>
+                                    {(l) => <div class="boot-line">{l}</div>}
+                                  </For>
+                                  <div class="boot-line">
+                                    <span class="boot-cursor">█</span>
+                                  </div>
                                 </div>
-                              </div>
-                            }
-                          >
-                            <AppleRainbow class="intro-logo" />
-                            <div class="intro-title">{profile.name}</div>
-                            <div class="intro-sub">Software Engineer</div>
-                            <button
-                              class="start-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                start();
-                              }}
+                              }
                             >
+                            <AppleRainbow class="intro-logo" />
+                            <div class="intro-terminal">
+                              <div class="term-greet">
+                                {greetTyped()}
+                                <Show
+                                  when={
+                                    !typingDone() && bioTyped().length === 0
+                                  }
+                                >
+                                  <span class="type-caret">█</span>
+                                </Show>
+                              </div>
+                              <div class="term-bio">
+                                {bioTyped()}
+                                <Show
+                                  when={!typingDone() && bioTyped().length > 0}
+                                >
+                                  <span class="type-caret">█</span>
+                                </Show>
+                              </div>
+                            </div>
+                            <div class="start-btn" aria-hidden="true">
                               Start
-                            </button>
+                            </div>
+                            </Show>
                           </Show>
                         </div>
                       </div>
