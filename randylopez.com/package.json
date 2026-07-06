@@ -1,0 +1,21 @@
+{
+  "name": "mac-crt-portfolio",
+  "version": "1.0.0",
+  "description": "A developer portfolio styled as a vintage all-in-one Macintosh with a CRT screen.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.4.10",
+    "vite-plugin-solid": "^2.10.2"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.3",
+    "three": "^0.134.0",
+    "vanta": "^0.5.24"
+  }
+}
