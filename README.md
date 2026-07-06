@@ -100,7 +100,3 @@ Most changes are content or a single constant:
         │   ├── AppContent.jsx      window contents (About, Contact, System, …)
         │   └── Icons.jsx           SVG icons
         └── styles/                 index.css, desktop.css, boot.css
-
-## License
-
-MIT
